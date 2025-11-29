@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Search Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .snowflakes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            color: #fff;
+            font-size: 1em;
+            text-shadow: 0 0 5px #fff;
+            animation: fall linear infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(360deg);
+                opacity: 0.3;
+            }
+        }
+
+        .auth-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2), 
+                        0 0 0 1px rgba(255, 255, 255, 0.1);
+            padding: 40px 30px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideUp 0.8s ease-out, glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2), 
+                            0 0 0 1px rgba(255, 255, 255, 0.1),
+                            0 0 30px rgba(100, 180, 255, 0.1);
+            }
+            to {
+                box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2), 
+                            0 0 0 1px rgba(255, 255, 255, 0.2),
+                            0 0 50px rgba(100, 180, 255, 0.2);
+            }
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo-icon {
+            font-size: 50px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(100, 180, 255, 0.5);
+            animation: fadeIn 1s ease-out 0.3s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-out 0.5s both;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 18px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #64b4ff;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(100, 180, 255, 0.3);
+            transform: scale(1.02);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 200% 200%;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            animation: fadeIn 1s ease-out 0.7s both, gradientMove 3s ease infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .toggle-text {
+            text-align: center;
+            margin-top: 25px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            animation: fadeIn 1s ease-out 0.9s both;
+        }
+
+        .toggle-text a {
+            color: #64b4ff;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .toggle-text a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #64b4ff;
+            transition: width 0.3s;
+        }
+
+        .toggle-text a:hover::after {
+            width: 100%;
+        }
+
+        .message {
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            animation: shake 0.5s ease-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .success {
+            background: rgba(76, 175, 80, 0.3);
+            color: #81c784;
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+
+        .error {
+            background: rgba(244, 67, 54, 0.3);
+            color: #ef9a9a;
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .dashboard-page {
+            display: none;
+            position: relative;
+            z-index: 10;
+        }
+
+        .dashboard-page.active {
+            display: block;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #fff;
+            font-size: 18px;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(100, 180, 255, 0.5);
+        }
+
+        .balance-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .plus-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(76, 175, 80, 0.4);
+        }
+
+        .plus-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        .logout-btn {
+            padding: 10px 18px;
+            background: linear-gradient(135deg, #f44336, #e91e63);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 10px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px 10px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .nav-tab.active {
+            border-bottom-color: #64b4ff;
+            background: rgba(100, 180, 255, 0.1);
+        }
+
+        .nav-tab-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .nav-tab-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+        }
+
+        .nav-tab.active .nav-tab-label {
+            color: #64b4ff;
+        }
+
+        .search-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-card h2 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 20px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(100, 180, 255, 0.3);
+        }
+
+        .search-section h3 {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 12px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .search-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: all 0.3s;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #64b4ff;
+            box-shadow: 0 0 15px rgba(100, 180, 255, 0.2);
+        }
+
+        .search-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .results-area {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .loading {
+            text-align: center;
+            color: #64b4ff;
+            font-weight: 600;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border-left: 4px solid #64b4ff;
+            font-size: 13px;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            overflow-y: auto;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(30, 30, 60, 0.95);
+            backdrop-filter: blur(20px);
+            margin: 30px auto;
+            padding: 25px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: modalSlide 0.4s ease-out;
+        }
+
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #fff;
+            font-size: 22px;
+        }
+
+        .close {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+            transition: all 0.3s;
+        }
+
+        .close:hover {
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        .qr-image {
+            max-width: 100%;
+            width: 220px;
+            margin: 15px auto;
+            display: block;
+            border-radius: 15px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .winter-decor {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.1), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="snowflakes" id="snowflakes"></div>
+    <div class="winter-decor"></div>
+
+    <!-- AUTH PAGE -->
+    <div class="auth-page" id="authPage">
+        <div class="container">
+            <div class="logo-container">
+                <div class="logo-icon">❄️</div>
+            </div>
+            <h1 id="form-title">Welcome Back</h1>
+            <div id="message" class="message hidden"></div>
+
+            <div style="background: rgba(100, 180, 255, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 25px; border: 1px solid rgba(100, 180, 255, 0.2);">
+                <p style="color: rgba(255, 255, 255, 0.9); font-size: 13px; line-height: 1.6; text-align: center;">
+                    Search any phone number to get detailed information instantly.
+                </p>
+            </div>
+
+            <form id="authForm">
+                <div class="form-group" id="nameGroup" style="display: none;">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" placeholder="Enter your name">
+                </div>
+                <div class="form-group" id="hashcodeGroup">
+                    <label for="hashcode">Hash Code</label>
+                    <input type="text" id="hashcode" placeholder="Enter your 6-digit code" maxlength="6">
+                </div>
+                <button type="submit" class="btn" id="submit-btn">Sign In</button>
+                <div class="toggle-text">
+                    <span id="toggle-message">Don't have an account?</span>
+                    <a id="toggle-link">Create Account</a>
+                </div>
+                <div class="toggle-text" id="forgotHashLink" style="margin-top: 10px;">
+                    <span style="color: rgba(255, 255, 255, 0.6);">Forgot your hash?</span>
+                    <a href="https://t.me/erotnc" target="_blank" style="color: #64b4ff; text-decoration: none; font-weight: 600;">Contact us - we will help you! 💬</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DASHBOARD PAGE -->
+    <div class="dashboard-page" id="dashboardPage">
+        <div class="header">
+            <div class="header-top">
+                <h1>❄️ Search Dashboard</h1>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                <h2 style="color: #64b4ff; font-size: 16px; margin: 0; text-shadow: 0 0 10px rgba(100, 180, 255, 0.5);">
+                    Hello <span id="userName" style="font-weight: 700; color: #fff;">User</span>! 👋
+                </h2>
+                <div class="balance-display" style="padding: 8px 10px; border-radius: 10px; font-size: 13px; min-width: auto; display: flex; align-items: center; gap: 6px;">
+                    <span id="balanceDisplay">💰 ₹0</span>
+                    <button class="plus-btn" onclick="openDepositModal()">+</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showTab('numberSearch', this)">
+                <div class="nav-tab-icon">📞</div>
+                <div class="nav-tab-label">NUMBER SEARCH</div>
+            </div>
+            <div class="nav-tab" onclick="showTab('telegramSearch', this)">
+                <div class="nav-tab-icon">📱</div>
+                <div class="nav-tab-label">TG USERNAME</div>
+            </div>
+        </div>
+
+        <div style="margin: 10px; padding: 10px 15px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%); border-radius: 10px; border: 1px solid rgba(100, 180, 255, 0.2); text-align: center;">
+            <span style="color: rgba(255,255,255,0.9); font-size: 12px;">Want to buy Search API?</span>
+            <a href="https://t.me/erotnc" target="_blank" style="color: #64b4ff; text-decoration: none; font-weight: 600; margin-left: 5px; font-size: 12px;">Contact Owner</a>
+        </div>
+
+        <div class="tab-content active" id="numberSearch">
+            <div class="search-card">
+                <h2>Search by Number 🔍</h2>
+                <div class="search-section">
+                    <h3>NUMBER SEARCH (₹4)</h3>
+                    <div class="search-input-group">
+                        <input type="tel" class="search-input" id="phoneInput" placeholder="Enter phone number">
+                        <button class="search-btn" onclick="searchPhone()">Search</button>
+                    </div>
+                </div>
+                <div class="results-area" id="phoneResults" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="telegramSearch">
+            <div class="search-card">
+                <h2>TG Username Search 💬</h2>
+
+                <!-- Subsection Tabs -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                    <div class="subsection-tab active" onclick="showSubsection('usernameSubsection', this)" style="flex: 1; padding: 12px; text-align: center; cursor: pointer; border-bottom: 3px solid #64b4ff; font-weight: 600; color: #64b4ff; font-size: 13px;">
+                        USERNAME SEARCH
+                    </div>
+                    <div class="subsection-tab" onclick="showSubsection('useridSubsection', this)" style="flex: 1; padding: 12px; text-align: center; cursor: pointer; border-bottom: 3px solid transparent; font-weight: 600; color: rgba(255,255,255,0.6); font-size: 13px;">
+                        USERID SEARCH
+                    </div>
+                </div>
+
+                <!-- Username Search Subsection -->
+                <div id="usernameSubsection" class="subsection-content" style="display: block;">
+                    <div class="search-section">
+                        <h3>USERNAME SEARCH (₹21)</h3>
+                        <div class="search-input-group">
+                            <input type="text" class="search-input" id="usernameInput" placeholder="Enter username (e.g., @username)">
+                            <button class="search-btn" onclick="searchUsername()">Search</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User ID Search Subsection -->
+                <div id="useridSubsection" class="subsection-content" style="display: none;">
+                    <div class="search-section">
+                        <h3>USERID SEARCH (₹21)</h3>
+                        <div class="search-input-group">
+                            <input type="text" class="search-input" id="useridInput" placeholder="Enter user ID (numeric)">
+                            <button class="search-btn" onclick="searchUserID()">Search</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-area" id="telegramResults" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deposit Modal -->
+    <div id="depositModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💳 Add Balance</h2>
+                <span class="close" onclick="closeDepositModal()">&times;</span>
+            </div>
+            <div id="depositStep1">
+                <div class="search-section">
+                    <h3>Enter Amount (Min ₹25)</h3>
+                    <div class="search-input-group">
+                        <input type="number" class="search-input" id="depositAmount" placeholder="Enter amount" min="25">
+                        <button class="search-btn" onclick="showQR()">Proceed to Payment</button>
+                        <button class="search-btn" onclick="showPromoCode()" style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); margin-top: 10px;">🎁 I have a promo code!</button>
+                    </div>
+                </div>
+            </div>
+            <div id="promoCodeStep" style="display: none;">
+                <div class="search-section">
+                    <h3>Enter Promo Code</h3>
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" id="promoCodeInput" placeholder="Enter promo code" style="text-transform: uppercase;">
+                        <button class="search-btn" onclick="applyPromoCode()">Apply Promo Code</button>
+                        <button class="search-btn" onclick="backToDeposit()" style="background: #f44336; margin-top: 10px;">← Back</button>
+                    </div>
+                </div>
+                <div class="results-area" id="promoResults" style="display: none;"></div>
+            </div>
+            <div id="depositStep2" style="display: none;">
+                <div style="text-align: center;">
+                    <h3 style="color: #64b4ff; margin-bottom: 10px;">Pay ₹<span id="payAmount">0</span></h3>
+                    <p style="color: rgba(255,255,255,0.7); font-size: 13px; margin-bottom: 10px;">Scan QR Code to Pay</p>
+                    <img src="assets/qr.jpg" alt="Payment QR" class="qr-image" style="background: white; padding: 10px; border-radius: 15px;" onerror="this.style.display='none'; this.parentElement.innerHTML+='<p style=color:red;>QR Code image not found</p>';">
+                </div>
+                <div class="search-section" style="margin-top: 15px;">
+                    <h3>Enter UTR Number (12 digits)</h3>
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" id="utrInput" placeholder="Enter 12-digit UTR" maxlength="12">
+                        <button class="search-btn" onclick="submitDeposit()">Submit</button>
+                    </div>
+                </div>
+            </div>
+            <div class="results-area" id="depositResults" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // API CONFIGURATION - CHANGE THIS URL
+        // Set this to your Zampto backend URL
+        // Example: 'https://your-app.zampto.com'
+        // ============================================
+        const API_URL = 'http://217.154.212.66:9511';
+        // ============================================
+
+        function createSnowflakes() {
+            const container = document.getElementById('snowflakes');
+            const snowflakeChars = ['❄', '❅', '❆', '✦', '✧', '•'];
+
+            for (let i = 0; i < 50; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.innerHTML = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+                snowflake.style.left = Math.random() * 100 + '%';
+                snowflake.style.fontSize = (Math.random() * 15 + 8) + 'px';
+                snowflake.style.opacity = Math.random() * 0.6 + 0.4;
+                snowflake.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                snowflake.style.animationDelay = (Math.random() * 10) + 's';
+                container.appendChild(snowflake);
+            }
+        }
+        createSnowflakes();
+
+        let isLogin = true;
+        let currentUser = null;
+
+        function checkAuth() {
+            const user = localStorage.getItem('user_name');
+            if (user) {
+                currentUser = user;
+                showDashboard();
+                updateBalance();
+            }
+        }
+
+        function showAuth() {
+            document.getElementById('authPage').style.display = 'flex';
+            document.getElementById('dashboardPage').classList.remove('active');
+        }
+
+        function showDashboard() {
+            document.getElementById('authPage').style.display = 'none';
+            document.getElementById('dashboardPage').classList.add('active');
+            // Update user name display
+            if (currentUser) {
+                document.getElementById('userName').textContent = currentUser;
+            }
+        }
+
+        function toggleAuthMode() {
+            isLogin = !isLogin;
+            const title = document.getElementById('form-title');
+            const submit = document.getElementById('submit-btn');
+            const toggle = document.getElementById('toggle-message');
+            const hashcodeGroup = document.getElementById('hashcodeGroup');
+            const nameGroup = document.getElementById('nameGroup');
+            const logoIcon = document.querySelector('.logo-icon');
+            const forgotHashLink = document.getElementById('forgotHashLink');
+
+            if (isLogin) {
+                title.textContent = 'Welcome Back';
+                submit.textContent = 'Sign In';
+                toggle.textContent = "Don't have an account?";
+                document.getElementById('toggle-link').textContent = 'Create Account';
+                hashcodeGroup.style.display = 'block';
+                nameGroup.style.display = 'none';
+                logoIcon.textContent = '❄️';
+                forgotHashLink.style.display = 'block';
+            } else {
+                title.textContent = 'Create Account';
+                submit.textContent = 'Sign Up';
+                toggle.textContent = 'Already have an account?';
+                document.getElementById('toggle-link').textContent = 'Sign In';
+                hashcodeGroup.style.display = 'none';
+                nameGroup.style.display = 'block';
+                logoIcon.textContent = '🌟';
+                forgotHashLink.style.display = 'none';
+            }
+            document.getElementById('message').className = 'message hidden';
+        }
+
+        document.getElementById('toggle-link').addEventListener('click', toggleAuthMode);
+
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const hashcode = document.getElementById('hashcode').value.trim();
+            const messageDiv = document.getElementById('message');
+
+            if (isLogin) {
+                if (!hashcode) {
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = '✗ Hash Code required';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(API_URL + '/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ hash_code: hashcode })
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        localStorage.setItem('user_name', data.user_name);
+                        localStorage.setItem('hash_code', hashcode);
+                        currentUser = data.user_name;
+                        document.getElementById('userName').textContent = currentUser;
+                        showDashboard();
+                        updateBalance();
+                    } else {
+                        messageDiv.className = 'message error';
+                        messageDiv.textContent = '✗ ' + data.message;
+                    }
+                } catch (error) {
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = '✗ Connection error';
+                }
+            } else {
+                if (!name) {
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = '✗ Name required';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(API_URL + '/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name })
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        const hashCode = data.hash_code;
+                        messageDiv.className = 'message success';
+                        messageDiv.innerHTML = `
+                            <div style="margin-bottom: 15px;">✓ Account created successfully!</div>
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px;">
+                                <span style="font-size: 28px; font-weight: 700; letter-spacing: 3px; color: #fff; text-shadow: 0 0 20px rgba(100, 180, 255, 0.8);">${hashCode}</span>
+                                <button onclick="copyHashCode('${hashCode}')" style="background: rgba(255,255,255,0.2); border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 18px; transition: all 0.3s;" title="Copy Hash Code">📋</button>
+                            </div>
+                            <div style="margin-top: 10px; font-size: 13px; color: rgba(255,255,255,0.8);">Save this code to login!</div>
+                        `;
+                        document.getElementById('authForm').reset();
+                        setTimeout(() => {
+                            toggleAuthMode();
+                            document.getElementById('hashcode').value = hashCode;
+                        }, 4000);
+                    } else {
+                        messageDiv.className = 'message error';
+                        messageDiv.textContent = '✗ ' + data.message;
+                    }
+                } catch (error) {
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = '✗ Connection error';
+                }
+            }
+        });
+
+        function copyHashCode(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✓';
+                btn.style.background = 'rgba(76, 175, 80, 0.3)';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = 'rgba(255,255,255,0.2)';
+                }, 1500);
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('user_name');
+            localStorage.removeItem('hash_code');
+            currentUser = null;
+            showAuth();
+            document.getElementById('authForm').reset();
+        }
+
+        async function updateBalance() {
+            try {
+                const userName = localStorage.getItem('user_name');
+                const response = await fetch(`${API_URL}/get_balance?user_name=${userName}`);
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('balanceDisplay').textContent = '💰 ₹' + data.balance;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function showTab(tabName, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            element.classList.add('active');
+        }
+
+        function showSubsection(subsectionId, element) {
+            // Hide all subsections
+            document.querySelectorAll('.subsection-content').forEach(sub => {
+                sub.style.display = 'none';
+            });
+
+            // Remove active from all tabs
+            document.querySelectorAll('.subsection-tab').forEach(tab => {
+                tab.style.borderBottomColor = 'transparent';
+                tab.style.color = 'rgba(255,255,255,0.6)';
+            });
+
+            // Show selected subsection
+            document.getElementById(subsectionId).style.display = 'block';
+
+            // Mark tab as active
+            element.style.borderBottomColor = '#64b4ff';
+            element.style.color = '#64b4ff';
+        }
+
+        async function showProgressiveMessages(resultsDiv, cancelToken) {
+            const messages = [
+                "⚠️ Don't Refresh - Otherwise Balance Will Be Deducted!",
+                "🔌 Connecting to the Database...",
+                "🔍 Searching in the Database...",
+                "🕵️ Deep Searching...",
+                "📥 Fetching Details from Database...",
+                "🔧 Details are Being Arranged..."
+            ];
+
+            let messageIndex = 0;
+            while (!cancelToken.cancelled) {
+                resultsDiv.innerHTML = '<div class="loading">' + messages[messageIndex] + '</div>';
+                await new Promise(resolve => setTimeout(resolve, 800));
+                messageIndex = (messageIndex + 1) % messages.length;
+            }
+        }
+
+        async function searchPhone() {
+            const phoneInput = document.getElementById('phoneInput');
+            const resultsDiv = document.getElementById('phoneResults');
+            const searchBtn = phoneInput.closest('.search-input-group').querySelector('.search-btn');
+            const phone = phoneInput.value.trim();
+
+            if (!phone) {
+                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = '<div class="error">Please enter a phone number</div>';
+                return;
+            }
+
+            resultsDiv.style.display = 'block';
+            searchBtn.disabled = true;
+            searchBtn.style.opacity = '0.5';
+            searchBtn.style.cursor = 'not-allowed';
+
+            try {
+                // Create cancel token
+                const cancelToken = { cancelled: false };
+                
+                // Start showing progressive messages in loop
+                const messagePromise = showProgressiveMessages(resultsDiv, cancelToken);
+
+                const userName = localStorage.getItem('user_name');
+                const response = await fetch(API_URL + '/search/number', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ number: phone, user_name: userName })
+                });
+
+                // Stop message loop
+                cancelToken.cancelled = true;
+
+                const data = await response.json();
+                if (data.success) {
+                    resultsDiv.innerHTML = '<div class="loading">🎉 Wooh!! Details Found 🎉</div>';
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    resultsDiv.innerHTML = '';
+                    displayColorfulJSON(resultsDiv, data.data);
+                    addOwnerCredit(resultsDiv);
+                    updateBalance();
+                } else {
+                    resultsDiv.innerHTML = '<div class="error">' + (data.message || 'No result found') + '</div>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="error">Connection error</div>';
+            } finally {
+                searchBtn.disabled = false;
+                searchBtn.style.opacity = '1';
+                searchBtn.style.cursor = 'pointer';
+            }
+        }
+
+        async function searchUsername() {
+            const usernameInput = document.getElementById('usernameInput');
+            const resultsDiv = document.getElementById('telegramResults');
+            const searchBtn = usernameInput.closest('.search-input-group').querySelector('.search-btn');
+            let username = usernameInput.value.trim();
+
+            if (!username) {
+                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = '<div class="error">Please enter a username</div>';
+                return;
+            }
+
+            // Keep @ if user enters it
+            if (!username.startsWith('@')) {
+                username = '@' + username;
+            }
+
+            resultsDiv.style.display = 'block';
+            searchBtn.disabled = true;
+            searchBtn.style.opacity = '0.5';
+            searchBtn.style.cursor = 'not-allowed';
+
+            try {
+                const cancelToken = { cancelled: false };
+                const messagePromise = showProgressiveMessages(resultsDiv, cancelToken);
+
+                const userName = localStorage.getItem('user_name');
+                const response = await fetch(API_URL + '/search/username', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, user_name: userName })
+                });
+
+                cancelToken.cancelled = true;
+                const data = await response.json();
+                if (data.success) {
+                    // Format data similar to number search JSON format
+                    let formattedData = [];
+                    
+                    // Add profile data from @TGDNAbot
+                    if (data.profile) {
+                        let profileRecord = [];
+                        if (data.profile.name) profileRecord.push({"Name": data.profile.name});
+                        if (data.profile.user_id) profileRecord.push({"User ID": data.profile.user_id});
+                        if (data.profile.username) profileRecord.push({"Username": "@" + data.profile.username});
+                        if (data.profile.created_date) profileRecord.push({"Created": data.profile.created_date});
+                        if (data.profile.account_age) profileRecord.push({"Account Age": data.profile.account_age});
+                        if (data.profile.premium) profileRecord.push({"Premium": data.profile.premium});
+                        if (profileRecord.length > 0) formattedData.push(profileRecord);
+                    }
+                    
+                    // Add phone number from @Dfjyt_bot
+                    if (data.phone_number) {
+                        formattedData.push([{"Phone": data.phone_number}]);
+                    }
+                    
+                    if (formattedData.length > 0) {
+                        resultsDiv.innerHTML = '<div class="loading">🎉 Wooh!! Details Found 🎉</div>';
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        resultsDiv.innerHTML = '';
+                        displayColorfulJSON(resultsDiv, formattedData);
+                        // Wait for typing to complete before adding owner credit
+                        setTimeout(() => {
+                            addOwnerCredit(resultsDiv);
+                        }, formattedData.length * 500 + 1000);
+                    } else {
+                        resultsDiv.innerHTML = '<div class="error">No result found</div>';
+                    }
+                    updateBalance();
+                } else {
+                    resultsDiv.innerHTML = '<div class="error">' + (data.message || 'No result found') + '</div>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="error">Connection error</div>';
+            } finally {
+                searchBtn.disabled = false;
+                searchBtn.style.opacity = '1';
+                searchBtn.style.cursor = 'pointer';
+            }
+        }
+
+        async function searchUserID() {
+            const userIdInput = document.getElementById('userIdInput');
+            const resultsDiv = document.getElementById('telegramResults');
+            const searchBtn = userIdInput.closest('.search-input-group').querySelector('.search-btn');
+            const userId = userIdInput.value.trim();
+
+            if (!userId) {
+                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = '<div class="error">Please enter a user ID</div>';
+                return;
+            }
+
+            resultsDiv.style.display = 'block';
+            searchBtn.disabled = true;
+            searchBtn.style.opacity = '0.5';
+            searchBtn.style.cursor = 'not-allowed';
+
+            try {
+                const cancelToken = { cancelled: false };
+                const messagePromise = showProgressiveMessages(resultsDiv, cancelToken);
+
+                const userName = localStorage.getItem('user_name');
+                const response = await fetch(API_URL + '/search/userid', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, user_name: userName })
+                });
+
+                cancelToken.cancelled = true;
+                const data = await response.json();
+                if (data.success) {
+                    // Format data similar to number search JSON format
+                    let formattedData = [[{"User ID": userId}, {"Phone": data.phone_number}]];
+                    resultsDiv.innerHTML = '<div class="loading">🎉 Wooh!! Details Found 🎉</div>';
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    resultsDiv.innerHTML = '';
+                    displayColorfulJSON(resultsDiv, formattedData);
+                    // Wait for typing to complete before adding owner credit
+                    setTimeout(() => {
+                        addOwnerCredit(resultsDiv);
+                    }, 1500);
+                    updateBalance();
+                } else {
+                    resultsDiv.innerHTML = '<div class="error">' + (data.message || 'No result found') + '</div>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="error">Connection error</div>';
+            } finally {
+                searchBtn.disabled = false;
+                searchBtn.style.opacity = '1';
+                searchBtn.style.cursor = 'pointer';
+            }
+        }
+
+        function addOwnerCredit(container) {
+            const creditDiv = document.createElement('div');
+            creditDiv.style.cssText = 'margin-top: 12px; padding: 8px 12px; background: rgba(100, 180, 255, 0.1); border-radius: 8px; text-align: center; border: 1px solid rgba(100, 180, 255, 0.2);';
+            creditDiv.innerHTML = '<span style="color: rgba(255,255,255,0.7); font-size: 11px;">Owner & Developer:</span> <a href="https://t.me/erotnc" target="_blank" style="color: #64b4ff; text-decoration: none; font-weight: 600; font-size: 11px;">@erotnc</a>';
+            container.appendChild(creditDiv);
+        }
+
+        function openDepositModal() {
+            document.getElementById('depositModal').style.display = 'block';
+            document.getElementById('depositStep1').style.display = 'block';
+            document.getElementById('depositStep2').style.display = 'none';
+            document.getElementById('depositResults').innerHTML = '';
+            document.getElementById('depositResults').style.display = 'none';
+        }
+
+        function closeDepositModal() {
+            document.getElementById('depositModal').style.display = 'none';
+            document.getElementById('depositAmount').value = '';
+            document.getElementById('utrInput').value = '';
+            document.getElementById('promoCodeInput').value = '';
+            document.getElementById('depositStep1').style.display = 'block';
+            document.getElementById('depositStep2').style.display = 'none';
+            document.getElementById('promoCodeStep').style.display = 'none';
+            document.getElementById('depositResults').style.display = 'none';
+        }
+
+        function showPromoCode() {
+            document.getElementById('depositStep1').style.display = 'none';
+            document.getElementById('promoCodeStep').style.display = 'block';
+            document.getElementById('promoResults').innerHTML = '';
+            document.getElementById('promoResults').style.display = 'none';
+        }
+
+        function backToDeposit() {
+            document.getElementById('depositStep1').style.display = 'block';
+            document.getElementById('promoCodeStep').style.display = 'none';
+            document.getElementById('promoResults').innerHTML = '';
+            document.getElementById('promoResults').style.display = 'none';
+        }
+
+        async function applyPromoCode() {
+            const promoCode = document.getElementById('promoCodeInput').value.trim().toUpperCase();
+            const resultsDiv = document.getElementById('promoResults');
+            const userName = localStorage.getItem('user_name');
+
+            if (!promoCode) {
+                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = '<div class="error">Please enter a promo code</div>';
+                return;
+            }
+
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="loading">🔄 Applying promo code...</div>';
+
+            try {
+                const response = await fetch(API_URL + '/apply_promo_code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        promo_code: promoCode,
+                        user_name: userName
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    resultsDiv.innerHTML = '<div class="success">✓ ' + data.message + '</div>';
+                    updateBalance();
+                    setTimeout(() => {
+                        closeDepositModal();
+                    }, 2000);
+                } else {
+                    resultsDiv.innerHTML = '<div class="error">✗ ' + data.message + '</div>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="error">Connection error</div>';
+            }
+        }
+
+        function showQR() {
+            const amount = document.getElementById('depositAmount').value;
+            const resultsDiv = document.getElementById('depositResults');
+            if (!amount || amount < 25) {
+                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = '<div class="error">Minimum amount is ₹25</div>';
+                return;
+            }
+            document.getElementById('payAmount').textContent = amount;
+            document.getElementById('depositStep1').style.display = 'none';
+            document.getElementById('depositStep2').style.display = 'block';
+            resultsDiv.innerHTML = '';
+            resultsDiv.style.display = 'none';
+        }
+
+        async function submitDeposit() {
+            const amount = document.getElementById('depositAmount').value;
+            const utr = document.getElementById('utrInput').value.trim();
+            const resultsDiv = document.getElementById('depositResults');
+
+            if (!utr || utr.length !== 12) {
+                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = '<div class="error">Please enter valid 12-digit UTR</div>';
+                return;
+            }
+
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="loading">🔄 Submitting...</div>';
+
+            try {
+                const userName = localStorage.getItem('user_name');
+                const response = await fetch(API_URL + '/submit_deposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        name: userName,
+                        amount: parseInt(amount),
+                        utr: utr
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    resultsDiv.innerHTML = '<div class="success">✓ Deposit request submitted! Wait for approval.</div>';
+                    document.getElementById('utrInput').value = '';
+                } else {
+                    resultsDiv.innerHTML = '<div class="error">' + (data.message || 'Error') + '</div>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="error">Connection error</div>';
+            }
+        }
+
+        // Duplicate function definition for submitModalDeposit, likely intended for a modal that doesn't exist.
+        // The existing submitDeposit function handles the deposit logic from the modal.
+        // If there was a separate modal for deposit, its elements would be named differently (e.g., modalDepositAmount).
+        // For now, assuming submitDeposit is the correct function for the modal.
+        async function submitModalDeposit() {
+            const amount = document.getElementById('depositAmount').value; // Assuming this is the correct ID for modal
+            const utr = document.getElementById('utrInput').value; // Assuming this is the correct ID for modal
+            const resultsDiv = document.getElementById('depositResults'); // Assuming this is the correct ID for modal
+            const userName = localStorage.getItem('user_name');
+
+            if (!userName) {
+                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = '<div class="error">Please login first</div>';
+                return;
+            }
+
+            if (!amount || parseFloat(amount) < 25) {
+                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = '<div class="error">Please enter minimum ₹25</div>';
+                return;
+            }
+
+            if (!utr || utr.length !== 12 || !/^\d{12}$/.test(utr)) {
+                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = '<div class="error">Please enter valid 12-digit UTR</div>';
+                return;
+            }
+
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="loading">🔄 Submitting deposit request...</div>';
+
+            try {
+                const response = await fetch(API_URL + '/submit_deposit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        amount: parseFloat(amount), 
+                        utr: utr, 
+                        user_name: userName 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultsDiv.innerHTML = '<div class="success">✅ Deposit request submitted! Please wait for admin approval.</div>';
+                    updateBalance();
+                    setTimeout(() => {
+                        closeDepositModal();
+                    }, 2000);
+                } else {
+                    resultsDiv.innerHTML = '<div class="error">' + (data.message || 'Error submitting deposit') + '</div>';
+                }
+            } catch (error) {
+                console.error('Deposit error:', error);
+                resultsDiv.innerHTML = '<div class="error">Connection error. Please try again.</div>';
+            }
+        }
+
+        function displayColorfulJSON(container, data) {
+            const jsonString = JSON.stringify(data, null, 2);
+            container.innerHTML = '';
+            
+            const preElement = document.createElement('pre');
+            preElement.style.margin = '0';
+            preElement.style.lineHeight = '1.6';
+            container.appendChild(preElement);
+            
+            let index = 0;
+            const speed = 10; // typing speed in ms
+            
+            function typeWriter() {
+                if (index < jsonString.length) {
+                    const char = jsonString[index];
+                    const span = document.createElement('span');
+                    
+                    // Color coding for different JSON elements
+                    if (char === '{' || char === '}' || char === '[' || char === ']') {
+                        span.style.color = '#ff6b6b';
+                        span.style.fontWeight = 'bold';
+                    } else if (char === ':') {
+                        span.style.color = '#4ecdc4';
+                    } else if (char === ',') {
+                        span.style.color = '#95e1d3';
+                    } else if (char === '"') {
+                        // Check if it's a key or value
+                        const nextColon = jsonString.indexOf(':', index);
+                        const nextComma = jsonString.indexOf(',', index);
+                        const nextNewline = jsonString.indexOf('\n', index);
+                        
+                        if (nextColon > 0 && (nextComma < 0 || nextColon < nextComma) && (nextNewline < 0 || nextColon < nextNewline)) {
+                            span.style.color = '#ffd93d';
+                            span.style.fontWeight = '600';
+                        } else {
+                            span.style.color = '#6bcf7f';
+                        }
+                    } else if (!isNaN(char) && char !== ' ') {
+                        span.style.color = '#a29bfe';
+                    } else {
+                        span.style.color = 'rgba(255, 255, 255, 0.9)';
+                    }
+                    
+                    span.textContent = char;
+                    preElement.appendChild(span);
+                    index++;
+                    setTimeout(typeWriter, speed);
+                } else {
+                    // Add a completion indicator
+                    const doneSpan = document.createElement('div');
+                    doneSpan.style.color = '#4ecdc4';
+                    doneSpan.style.marginTop = '10px';
+                    doneSpan.style.fontWeight = 'bold';
+                    doneSpan.textContent = '✓ Complete';
+                    container.appendChild(doneSpan);
+                }
+            }
+            
+            typeWriter();
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('depositModal');
+            if (event.target == modal) closeDepositModal();
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>
